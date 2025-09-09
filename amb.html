@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="amb-typewriter"></title> <!-- Initial empty title -->
+    <meta property="og:title" content="doll.rip" />
+    <meta property="og:description" content="picture perfect" />
+    <meta property="og:url" co  ntent="doll.rip">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="https://cdn.discordapp.com/emojis/1276099611622375468.webp?size=96">
+    <meta name="theme-color" content="#303135">
+    <link rel="stylesheet" href="css/amb.css">
+    <script src="scripts/snow.js" async></script>
+</head>
+<body oncontextmenu="return false;" ondragstart="return false;" style="cursor: url('https://r2.guns.lol/af153b95-5c99-4a75-8fe5-2c4cf75bcce7.png') 16 16, auto !important;">
+    <div class="overlay" id="overlay">
+        [ touch me ]
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <button class="music-button" id="musicButton" style="border: none !important;">
+                <i class="fa-solid fa-volume-high" id="musicIcon"></i> <!-- Default icon -->
+            </button>
+            <div class="nav">
+                <a href="index">Home</a>
+            </div>
+        </div>
+
+        <div class="container" id="blurBox">
+            <img class="pfp-image" src="images/1.png" alt="pfp">
+            <p class="username">
+                <span class="sparkle">amb</span>
+            </p>
+            <p class="bio-text">you have no heart</p>
+            <div class="socials">
+                <div class="tooltip"><a target="_blank" href="https://instagram.com/wtvambie"><i class="fa-brands fa-instagram social-icons" style="color: black; text-shadow: none;"></i></a></div>
+                <div class="tooltip"><a target="_blank" href="https://tiktok.com/@ambiesta"><i class="fa-brands fa-tiktok social-icons" style="color: black; text-shadow: none;"></i></a></div>
+                <div class="tooltip"><a target="_blank" href="https://discord.com/users/1136198322911203452"><i class="fa-brands fa-discord social-icons" style="color: black; text-shadow: none;"></i></a></div>
+                <div class="tooltip"><a target="_blank" href="https://www.roblox.com/users/122843911/profile"><img src="https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/0/e/e/0eeeb19633422b1241f4306419a0f15f39d58de9.png" alt="Roblox" class="social-icons" style="width: 40px; height: 40px; filter: brightness(0); vertical-align: middle;"></a></div>
+            </div>
+            <div class="views">
+                <i class="fa-solid fa-eye"></i> <span id="viewerCount"></span>
+            </div>
+        </div>
+
+        <!-- Custom Music Player Container -->
+        <div class="music-player-container">
+            <audio id="audioPlayer" preload="metadata"></audio>
+            <div class="music-player">
+                <div class="music-cover">
+                    <img id="currentSongCover" src="images/2.png" alt="Music Cover">
+                </div>
+                <div class="music-info">
+                    <p class="song-title" id="currentSongTitle"><3</p>
+                    <div class="progress-area">
+                        <div class="progress" style="background: black !important;"></div>
+                    </div>
+                    <div class="time-controls">
+                        <span id="currentTime">0:00</span>
+                        <span id="totalDuration">0:00</span>
+                    </div>
+                </div>
+            <div class="music-controls">
+                <i id="prevSong" class="fa-solid fa-backward-step"></i>
+                <i id="playPause" class="fa-solid fa-play"></i>
+                <i id="nextSong" class="fa-solid fa-forward-step"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
+
+        var overlay = document.getElementById("overlay");
+        var mainContent = document.getElementById("mainContent");
+        var audioPlayer = document.getElementById("audioPlayer");
+        var playPauseButton = document.getElementById("playPause");
+        var prevSongButton = document.getElementById("prevSong");
+        var nextSongButton = document.getElementById("nextSong");
+        var currentSongCover = document.getElementById("currentSongCover");
+        var currentSongTitle = document.getElementById("currentSongTitle");
+        var currentTimeSpan = document.getElementById("currentTime");
+        var totalDurationSpan = document.getElementById("totalDuration");
+        var progressArea = document.querySelector(".progress-area"); // Select the progress-area
+        var progress = document.querySelector(".progress");
+        var viewerCountSpan = document.querySelector(".views span");
+        // var volumeSlider = document.getElementById("volumeSlider"); // Removed volume slider
+        // var volumeIcon = document.getElementById("volumeIcon"); // Removed volume icon
+
+        const currentPage = 'amb'; // Define the current page for viewer count
+        const SERVER_ENDPOINT = 'https://doll-qx4w.onrender.com'; // Your Render server URL
+
+        async function updateViewerCount() {
+            try {
+                const response = await fetch(`${SERVER_ENDPOINT}/viewer-count?page=${currentPage}`);
+                const data = await response.json();
+                viewerCountSpan.textContent = data.count;
+            } catch (error) {
+                console.error('Error updating viewer count:', error);
+                viewerCountSpan.textContent = 'Error';
+            }
+        }
+
+        async function incrementViewerCount() {
+            if (sessionStorage.getItem(`viewerCountIncremented_${currentPage}`)) {
+                return;
+            }
+            try {
+                await fetch(`${SERVER_ENDPOINT}/viewer-count/increment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ page: currentPage }),
+                });
+                sessionStorage.setItem(`viewerCountIncremented_${currentPage}`, 'true');
+                updateViewerCount();
+            } catch (error) {
+                console.error('Error incrementing viewer count:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateViewerCount();
+            loadSong(currentSongIndex); // Load the first song details on page load
+        });
+
+        setInterval(updateViewerCount, 5000);
+
+        var songs = [
+            {
+                src: "songs/tylenol.mp3",
+                title: "tylenol",
+                cover: "images/3.png"
+            },
+            {
+                src: "songs/4u.mp3",
+                title: "4u",
+                cover: "images/3.png",
+            },
+            {
+                src: "songs/convenience.mp3",
+                title: "convenience",
+                cover: "images/3.png"
+            },
+            {
+                src: "songs/migraine.mp3",
+                title: "migraine",
+                cover: "images/3.png"
+            }
+        ];
+
+        var currentSongIndex = 0;
+
+        function loadSong(index) {
+            var song = songs[index];
+            audioPlayer.src = song.src;
+            currentSongTitle.textContent = song.title;
+            currentSongCover.src = song.cover;
+            audioPlayer.load();
+        }
+
+        function playSong() {
+            audioPlayer.play();
+            playPauseButton.classList.remove("fa-play");
+            playPauseButton.classList.add("fa-pause");
+        }
+
+        function pauseSong() {
+            audioPlayer.pause();
+            playPauseButton.classList.remove("fa-pause");
+            playPauseButton.classList.add("fa-play");
+        }
+
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            loadSong(currentSongIndex);
+            playSong();
+        }
+
+        function prevSong() {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            loadSong(currentSongIndex);
+            playSong();
+        }
+
+        // Event Listeners
+        playPauseButton.addEventListener("click", function() {
+            if (audioPlayer.paused) {
+                playSong();
+            } else {
+                pauseSong();
+            }
+        });
+
+
+        nextSongButton.addEventListener("click", nextSong);
+        prevSongButton.addEventListener("click", prevSong);
+
+        audioPlayer.addEventListener("timeupdate", function() {
+            var progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progress.style.width = progressPercent + "%";
+
+            var minutes = Math.floor(audioPlayer.currentTime / 60);
+            var seconds = Math.floor(audioPlayer.currentTime % 60);
+            currentTimeSpan.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        });
+
+        audioPlayer.addEventListener("loadedmetadata", function() {
+            var minutes = Math.floor(audioPlayer.duration / 60);
+            var seconds = Math.floor(audioPlayer.duration % 60);
+            totalDurationSpan.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        });
+
+        audioPlayer.addEventListener("ended", nextSong);
+
+        var isDragging = false;
+
+        progressArea.addEventListener("mousedown", function(e) {
+            isDragging = true;
+            progressArea.classList.add("dragging"); // Add dragging class for visual feedback
+            audioPlayer.pause(); // Pause audio while dragging
+            updateProgress(e);
+        });
+
+        document.addEventListener("mousemove", function(e) {
+            if (isDragging) {
+                updateProgress(e);
+            }
+        });
+
+        document.addEventListener("mouseup", function() {
+            if (isDragging) {
+                isDragging = false;
+                progressArea.classList.remove("dragging"); // Remove dragging class
+                playSong(); // Resume playing after dragging
+            }
+        });
+
+        function updateProgress(e) {
+            var progressAreaRect = progressArea.getBoundingClientRect(); // Use progressAreaRect
+            var clickX = e.clientX - progressAreaRect.left;
+            var width = progressAreaRect.width;
+            var duration = audioPlayer.duration;
+            audioPlayer.currentTime = (clickX / width) * duration;
+        }
+
+        // Click event for overlay
+        overlay.addEventListener("click", async function() {
+            console.log('Overlay clicked.');
+            overlay.style.opacity = '0'; // Fade out overlay
+            await incrementViewerCount(); // Increment viewer count when user clicks to enter
+            loadSong(currentSongIndex); // Start loading the song immediately upon overlay click
+
+            setTimeout(function() {
+                overlay.style.opacity = '0'; // Fade out overlay
+                overlay.style.display = 'none'; // Hide overlay after fade out
+                mainContent.style.display = 'flex'; // Show main content
+
+                // Attach the listener BEFORE loading the song
+                audioPlayer.oncanplaythrough = () => {
+                    playSong();
+                    audioPlayer.oncanplaythrough = null; // Remove the event listener
+                };
+
+                loadSong(currentSongIndex); // Load the first song, which will trigger oncanplaythrough when ready
+
+                // Enable spacebar control after overlay is gone
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === ' ') {
+                        e.preventDefault();
+                        if (audioPlayer.paused) {
+                            playSong();
+                        } else {
+                            pauseSong();
+                        }
+                    }
+                });
+            }, 1000); // Match the timeout with the CSS transition duration
+        });
+
+            // Typing effect for the page title
+        const titleText = "@amb 𝜗𝜚"; // Re-added glitched characters
+        let titleIndex = 0;
+        let isDeleting = false; // Flag to check if we are deleting
+
+        function typeTitle() {
+            if (isDeleting) {
+                // Remove one character
+                document.title = titleText.substring(0, titleIndex);
+                titleIndex--;
+                if (titleIndex < 1) { // Stop at '@'
+                    isDeleting = false; // Switch to typing mode
+                    setTimeout(typeTitle, 500); // Wait before starting to type again
+                } else {
+                    setTimeout(typeTitle, 100); // Speed of deleting
+                }
+            } else {
+                // Add one character
+                document.title = titleText.substring(0, titleIndex + 1);
+                titleIndex++;
+                if (titleIndex > titleText.length) {
+                    isDeleting = true; // Switch to deleting mode
+                    setTimeout(typeTitle, 500); // Wait before starting to delete
+                } else {
+                    setTimeout(typeTitle, 200); // Speed of typing
+                }
+            }
+        }
+
+        // Start the typing effect
+        typeTitle();
+
+    </script>
+</body>
+</html>

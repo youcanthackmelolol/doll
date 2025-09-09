@@ -1,0 +1,443 @@
+@font-face {
+    font-family: 'Satoshi';
+    src: url('../media/4aa9d72202762699-s.p.ttf') format('truetype'); /* Assuming this is Satoshi or a suitable replacement */
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    font-style: normal;
+    font-weight: 200;
+    src: url('https://fonts.cdnfonts.com/s/31977/Satoshi.woff') format('woff');
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+body {
+    font-family: 'Satoshi', sans-serif; /* Changed to Satoshi */
+    background-image: url('../images/1.gif');
+    cursor: url('https://r2.guns.lol/af153b95-5c99-4a75-8fe5-2c4cf75bcce7.png') 16 16, auto !important; /* Restore default cursor */
+    background-size: cover;
+    background-position: center;
+}
+
+.cursor-sparkle {
+    position: fixed;
+    /* background-color: white; */ /* Sparkle color - removed as it's now an image */
+    border-radius: 50%;
+    pointer-events: none; /* Allow clicks to pass through */
+    opacity: 1 !important; /* FOR DEBUGGING: Make sparkles always visible */
+    transform: scale(1) !important; /* FOR DEBUGGING: Make sparkles always visible */
+    z-index: 9999; /* Ensure sparkles are on top */
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    text-align: center;
+    transition: opacity 1s ease;
+    z-index: 10;
+}
+.main-content {
+    display: none;
+    height: 100vh;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 5rem; /* 80px, adjusted for responsiveness */
+    gap: 10px;
+    box-sizing: border-box; /* Include padding in height calculation */
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem; /* 20px */
+    width: 100%;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 5;
+}
+.nav {
+    display: flex;
+    gap: 15px;
+}
+.nav a {
+    color: black;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+.nav a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+.music-button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 10px;
+    color: black;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s ease;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none !important;
+    box-shadow: none !important;
+}
+.music-button:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+.music-button:focus, .music-button:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+.container {
+    position: relative;
+    margin-top: 0; /* Removed margin-top */
+    text-align: center;
+    border-radius: 20px;
+    padding: 2.5rem; /* 40px */
+    width: 400px;
+    height: auto;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.pfp-image {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: none;
+    margin-bottom: 5px; /* Adjusted for recentering */
+    aspect-ratio: 1 / 1;
+}
+.username {
+    font-size: 24px;
+    font-weight: 700;
+    color: black;
+    margin-top: 5px; /* Adjusted for recentering */
+    margin-bottom: 5px; /* Adjusted for recentering */
+}
+.bio-text {
+    font-size: 16px;
+    color: black;
+    margin: 0 0 10px 0; /* Adjusted for recentering */
+}
+.socials {
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+.social-icons {
+    font-size: 34px;
+    color: black;
+    transition: transform 0.3s ease;
+    text-shadow: none;
+    vertical-align: middle;
+}
+.social-icons:hover {
+    transform: scale(1.1);
+}
+.views {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: black;
+    font-size: 16px;
+    margin-bottom: 0;
+}
+.music-player-container {
+    margin-top: 0;
+    width: 400px;
+    display: flex;
+    flex-direction: column; /* Revert to column to stack player and volume controls */
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Adjust gap */
+}
+.music-player {
+    display: flex;
+    flex-direction: row; /* Stack items vertically */
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 0.9375rem; /* 15px */
+}
+.music-cover {
+    flex-shrink: 0;
+}
+.music-cover img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+.music-info {
+    flex-grow: 1;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.song-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    margin: 0 0 5px 0;
+}
+.progress-area {
+    width: 100%;
+    height: 10px;
+    background: #555;
+    border-radius: 5px;
+    cursor: grab;
+    margin-bottom: 5px;
+    outline: none;
+    box-shadow: none;
+}
+.progress-area.dragging {
+    cursor: grabbing;
+}
+.progress {
+    height: 100%;
+    width: 0%;
+    background: black !important;
+    border-radius: 5px;
+    transition: width 0.1s linear;
+}
+
+/* Styling for the progress slider (track) */
+.progress-area {
+    -webkit-appearance: none; /* Remove default webkit styles */
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    background: #555; /* Default track color */
+    border-radius: 5px;
+    cursor: grab;
+    margin-bottom: 5px;
+    outline: none;
+    box-shadow: none;
+}
+
+/* Styling for the progress slider (thumb) */
+.progress-area::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px; /* Adjust thumb size */
+    height: 15px; /* Adjust thumb size */
+    background: black; /* Thumb color */
+    border-radius: 50%;
+    cursor: grab;
+    margin-top: -2.5px; /* Center thumb vertically */
+}
+
+.progress-area::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: black;
+    border-radius: 50%;
+    cursor: grab;
+}
+
+.progress-area.dragging {
+    cursor: grabbing;
+}
+
+.time-controls {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: black;
+}
+.music-controls {
+    display: flex;
+    gap: 15px;
+    font-size: 24px;
+    color: black;
+    align-items: center;
+}
+.music-controls i {
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+.music-controls i:hover {
+    color: black;
+    transform: scale(1.1);
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 80px; /* Adjust width to fit within controls */
+    height: 8px; /* Adjust height for better visibility */
+    background: #555; /* Track color */
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    margin-left: 10px; /* Space from other controls */
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px; /* Adjust thumb size */
+    height: 12px; /* Adjust thumb size */
+    background: black; /* Thumb color */
+    border-radius: 50%;
+    cursor: grab;
+    margin-top: -2px; /* Center thumb vertically */
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: black;
+    border-radius: 50%;
+    cursor: grab;
+}
+
+/* Responsive adjustments for kira.html */
+@media (max-width: 768px) {
+    .header {
+        padding: 0.9375rem; /* 15px */
+    }
+    .nav {
+        gap: 0.625rem; /* 10px */
+    }
+    .container {
+        width: 75%; /* Slightly larger width */
+        padding: 1.125rem; /* Slightly more padding */
+        max-width: 20rem; /* Slightly larger max-width */
+    }
+    .pfp-image {
+        width: 5.5rem; /* Slightly larger pfp */
+        height: 5.5rem; /* Slightly larger pfp */
+    }
+    .username {
+        font-size: 1.15em; /* Slightly larger font size */
+    }
+    .bio-text {
+        font-size: 0.85em; /* Slightly larger font size */
+    }
+    .social-icons {
+        font-size: 1.8em; /* Slightly larger icons */
+    }
+    .music-player {
+        width: 75%; /* Slightly larger width */
+        padding: 0.875rem; /* Slightly more padding */
+    }
+    .music-cover img {
+        width: 2.75rem; /* Slightly larger cover */
+        height: 2.75rem; /* Slightly larger cover */
+    }
+    .song-title {
+        font-size: 0.95em; /* Slightly larger font size */
+    }
+    .music-controls {
+        font-size: 1.2em; /* Slightly larger controls */
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 0.625rem; /* 10px */
+    }
+    .nav {
+        gap: 0.5rem; /* 8px */
+    }
+    .music-button {
+        width: 3.125rem; /* 50px */
+        height: 3.125rem; /* 50px */
+        padding: 0.625rem; /* 10px */
+    }
+    .container {
+        width: 90%; /* Slightly larger width */
+        padding: 1.125rem; /* Slightly more padding */
+        max-width: 18rem; /* Slightly larger max-width */
+    }
+    .pfp-image {
+        width: 4.5rem; /* Slightly larger pfp */
+        height: 4.5rem; /* Slightly larger pfp */
+    }
+    .username {
+        font-size: 1.05em; /* Slightly larger font size */
+    }
+    .bio-text {
+        font-size: 0.75em; /* Slightly larger font size */
+    }
+    .socials {
+        gap: 0.6rem; /* Slightly larger gap */
+    }
+    .social-icons {
+        font-size: 1.6em; /* Slightly larger icons */
+    }
+    .music-player {
+        flex-direction: row;
+        align-items: center;
+        width: 90%; /* Slightly larger width */
+        gap: 0.875rem; /* Slightly larger gap */
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border-radius: 1.125rem; /* Slightly larger border-radius */
+        padding: 0.875rem; /* Slightly more padding */
+        box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.5); /* Slightly larger shadow */
+    }
+    .music-controls {
+        font-size: 1.05em; /* Slightly larger controls */
+        gap: 0.6rem; /* Slightly larger gap */
+    }
+    .views {
+        font-size: 0.8em; /* Slightly larger font size */
+        bottom: 0.6rem; /* Adjusted position */
+        left: 0.6rem; /* Adjusted position */
+    }
+}

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="xo-typewriter"></title> <!-- Initial empty title -->
+    <meta property="og:title" content="doll" />
+    <meta property="og:description" content="picture perfect" />
+    <meta property="og:url" content="doll">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="https://cdn.discordapp.com/emojis/1304214729006383104.webp?size=96">
+    <meta name="theme-color" content="#303135">
+    <link rel="stylesheet" href="css/xo.css">
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+</head>
+<body oncontextmenu="return false;" ondragstart="return false;">
+
+    <div class="overlay" id="overlay">
+        test ur faith
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <button class="music-button" id="musicButton" style="border: none !important;">
+                <i class="fa-solid fa-volume-high" id="musicIcon"></i> <!-- Default icon -->
+            </button>
+            <div class="nav">
+                <a href="index.html">Home</a>
+            </div>
+        </div>
+
+        <div class="container" id="blurBox">
+            <img class="pfp-image" src="images/k.png" alt="pfp">
+            <p class="username">
+                <span class="sparkle">xo</span>
+            </p>
+            <p class="bio-text">still the same</p>
+            <div class="socials">
+                <div class="tooltip">
+                    <a target="_blank" href="https://instagram.com/iwenttowarwithmyself">
+                        <i class="fa-brands fa-instagram social-icons" style="color: white; text-shadow: none;"></i>
+                    </a>
+                </div>
+                <div class="tooltip">
+                    <a target="_blank" href="https://tiktok.com/@creepnthrudatbackdoor">
+                        <i class="fa-brands fa-tiktok social-icons" style="color: white; text-shadow: none;"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="views">
+                <i class="fa-solid fa-eye"></i> <span id="viewerCount"></span>
+            </div>
+        </div>
+
+        <!-- Custom Music Player -->
+        <div class="music-player-container">
+            <audio id="audioPlayer" preload="metadata"></audio>
+            <div class="music-player">
+                <div class="music-cover">
+                    <img id="currentSongCover" src="images/2.png" alt="Music Cover">
+                </div>
+                <div class="music-info">
+                    <p class="song-title" id="currentSongTitle"><3</p>
+                    <div class="progress-area">
+                        <div class="progress" style="background: white !important;"></div>
+                    </div>
+                    <div class="time-controls">
+                        <span id="currentTime">0:00</span>
+                        <span id="totalDuration">0:00</span>
+                    </div>
+                </div>
+                <div class="music-controls">
+                    <i id="prevSong" class="fa-solid fa-backward-step"></i>
+                    <i id="playPause" class="fa-solid fa-play"></i>
+                    <i id="nextSong" class="fa-solid fa-forward-step"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Prevent Inspect + Spacebar controls
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
+
+        var overlay = document.getElementById("overlay");
+        var mainContent = document.getElementById("mainContent");
+        var audioPlayer = document.getElementById("audioPlayer");
+        var playPauseButton = document.getElementById("playPause");
+        var prevSongButton = document.getElementById("prevSong");
+        var nextSongButton = document.getElementById("nextSong");
+        var currentSongCover = document.getElementById("currentSongCover");
+        var currentSongTitle = document.getElementById("currentSongTitle");
+        var currentTimeSpan = document.getElementById("currentTime");
+        var totalDurationSpan = document.getElementById("totalDuration");
+        var progressArea = document.querySelector(".progress-area");
+        var progress = document.querySelector(".progress");
+        var viewerCountSpan = document.querySelector(".views span");
+
+        const currentPage = 'xo';
+        const SERVER_ENDPOINT = 'https://doll-qx4w.onrender.com';
+
+        async function updateViewerCount() {
+            try {
+                const response = await fetch(`${SERVER_ENDPOINT}/viewer-count?page=${currentPage}`);
+                const data = await response.json();
+                viewerCountSpan.textContent = data.count;
+            } catch (error) {
+                console.error('Error updating viewer count:', error);
+                viewerCountSpan.textContent = 'Error';
+            }
+        }
+
+        async function incrementViewerCount() {
+            if (sessionStorage.getItem(`viewerCountIncremented_${currentPage}`)) {
+                return;
+            }
+            try {
+                await fetch(`${SERVER_ENDPOINT}/viewer-count/increment`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ page: currentPage }),
+                });
+                sessionStorage.setItem(`viewerCountIncremented_${currentPage}`, 'true');
+                updateViewerCount();
+            } catch (error) {
+                console.error('Error incrementing viewer count:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateViewerCount();
+            loadSong(currentSongIndex);
+        });
+
+        setInterval(updateViewerCount, 5000);
+
+        var songs = [
+            { src: "songs/thatsit.mp3", title: "<3", cover: "images/c.jpg" },
+            { src: "songs/3am.mp3", title: ":3", cover: "images/c.jpg" },
+            { src: "songs/howtofeel.mp3", title: ":/", cover: "images/c.jpg" },
+            { src: "songs/squad.mp3", title: ":(", cover: "images/c.jpg" }
+        ];
+
+        var currentSongIndex = 0;
+
+        function loadSong(index) {
+            var song = songs[index];
+            audioPlayer.src = song.src;
+            currentSongTitle.textContent = song.title;
+            currentSongCover.src = song.cover;
+            audioPlayer.load();
+        }
+
+        function playSong() {
+            audioPlayer.play();
+            playPauseButton.classList.remove("fa-play");
+            playPauseButton.classList.add("fa-pause");
+        }
+
+        function pauseSong() {
+            audioPlayer.pause();
+            playPauseButton.classList.remove("fa-pause");
+            playPauseButton.classList.add("fa-play");
+        }
+
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            loadSong(currentSongIndex);
+            playSong();
+        }
+
+        function prevSong() {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            loadSong(currentSongIndex);
+            playSong();
+        }
+
+        // Event Listeners
+        playPauseButton.addEventListener("click", () => audioPlayer.paused ? playSong() : pauseSong());
+        nextSongButton.addEventListener("click", nextSong);
+        prevSongButton.addEventListener("click", prevSong);
+
+        audioPlayer.addEventListener("timeupdate", () => {
+            var progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progress.style.width = progressPercent + "%";
+            var minutes = Math.floor(audioPlayer.currentTime / 60);
+            var seconds = Math.floor(audioPlayer.currentTime % 60);
+            currentTimeSpan.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        });
+        audioPlayer.addEventListener("loadedmetadata", () => {
+            var minutes = Math.floor(audioPlayer.duration / 60);
+            var seconds = Math.floor(audioPlayer.duration % 60);
+            totalDurationSpan.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        });
+        audioPlayer.addEventListener("ended", nextSong);
+
+        var isDragging = false;
+        progressArea.addEventListener("mousedown", e => { isDragging = true; audioPlayer.pause(); updateProgress(e); });
+        document.addEventListener("mousemove", e => { if (isDragging) updateProgress(e); });
+        document.addEventListener("mouseup", () => { if (isDragging) { isDragging = false; playSong(); } });
+
+        function updateProgress(e) {
+            var rect = progressArea.getBoundingClientRect();
+            var clickX = e.clientX - rect.left;
+            var width = rect.width;
+            audioPlayer.currentTime = (clickX / width) * audioPlayer.duration;
+        }
+
+        overlay.addEventListener("click", async () => {
+            overlay.style.opacity = '0';
+            await incrementViewerCount();
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                mainContent.style.display = 'flex';
+                audioPlayer.oncanplaythrough = () => { playSong(); audioPlayer.oncanplaythrough = null; };
+                loadSong(currentSongIndex);
+
+                // Enable spacebar control after overlay is gone
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === ' ') {
+                        e.preventDefault();
+                        if (audioPlayer.paused) {
+                            playSong();
+                        } else {
+                            pauseSong();
+                        }
+                    }
+                });
+            }, 1000);
+        });
+
+        // Typing effect for page title
+        const titleText = "@xo";
+        let titleIndex = 0;
+        let isDeleting = false;
+        function typeTitle() {
+            if (isDeleting) {
+                document.title = titleText.substring(0, titleIndex);
+                titleIndex--;
+                if (titleIndex < 1) { isDeleting = false; setTimeout(typeTitle, 500); }
+                else setTimeout(typeTitle, 100);
+            } else {
+                document.title = titleText.substring(0, titleIndex + 1);
+                titleIndex++;
+                if (titleIndex > titleText.length) { isDeleting = true; setTimeout(typeTitle, 500); }
+                else setTimeout(typeTitle, 200);
+            }
+        }
+        typeTitle();
+    </script>
+    <script src="scripts/sparkle.js"></script>
+</body>
+</html>
